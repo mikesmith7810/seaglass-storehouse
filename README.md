@@ -1,6 +1,6 @@
 # Seaglass Storehouse
 
-Inventory management system for [Seaglass Home Designs](https://www.seaglasshomedesigns.com) — a Dorset-based home staging business. Tracks furniture and props across storage locations, with pricing and dimensions, designed to be used as a PWA on an iPhone.
+Inventory management system for tracking furniture and props across storage locations, with pricing and dimensions. Designed to be used as a PWA on an iPhone.
 
 ---
 
