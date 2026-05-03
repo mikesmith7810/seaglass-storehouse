@@ -6,12 +6,12 @@
 - Variable names must reflect their type using camelCase — e.g. a `StorageHouse` instance is named `storageHouse`, a `List<Item>` is named `itemList`
 - No Javadoc comments — code and naming should be self-describing
 
-## Spring Boot Architecture
+## Quarkus Architecture
 
 Strict layered architecture with no logic leaking between layers:
 
-- **Controller** — HTTP boundary only; no business logic; delegates entirely to a service
-- **Service** — all business logic lives here; dependencies (repositories, third-party clients, etc.) are injected via constructor injection
+- **Resource** (`@Path` JAX-RS class) — HTTP boundary only; no business logic; delegates entirely to a service
+- **Service** (`@ApplicationScoped` CDI bean) — all business logic lives here; dependencies (repositories, third-party clients, etc.) are injected via `@Inject`
 
 ## Model / DTO Objects
 

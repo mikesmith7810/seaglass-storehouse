@@ -1,13 +1,12 @@
 package com.mike.seaglassstorehouse;
 
+import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+@QuarkusTest
 class SeaglassStorehouseApplicationTests {
 
     @Test
-    void contextLoads() {
+    void applicationStarts() {
     }
-
 }

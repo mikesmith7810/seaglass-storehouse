@@ -1,13 +1,12 @@
 package com.mike.seaglassstorehouse;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import io.quarkus.runtime.Quarkus;
+import io.quarkus.runtime.annotations.QuarkusMain;
 
-@SpringBootApplication
+@QuarkusMain
 public class SeaglassStorehouseApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(SeaglassStorehouseApplication.class, args);
+    public static void main(final String... args) {
+        Quarkus.run(args);
     }
-
 }
