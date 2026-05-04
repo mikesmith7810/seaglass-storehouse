@@ -1,4 +1,4 @@
-# Seaglass Storehouse
+# Stager Hub
 
 Inventory management system for tracking furniture and props across storage locations, with pricing and dimensions. Designed to be used as a PWA on an iPhone.
 
@@ -73,7 +73,7 @@ Runs on `http://localhost:5173`. The Vite dev server proxies `/api` to `:8080`.
 | `POST` | `/api/items` | Create an item |
 | `PUT` | `/api/items/{id}` | Update an item |
 
-A Postman collection is available at `postman/seaglass-storehouse.json`.
+A Postman collection is available at `postman/stager-hub.json`.
 
 ---
 

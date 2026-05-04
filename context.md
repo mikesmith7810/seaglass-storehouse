@@ -1,6 +1,6 @@
 # Session Context
 
-This file provides continuity between Claude Code sessions for the Seaglass Storehouse project.
+This file provides continuity between Claude Code sessions for the Stager Hub project.
 
 ---
 
@@ -40,16 +40,16 @@ A home staging inventory PWA. Tracks furniture and props across storage location
 ## Project structure
 
 ```
-seaglass-storehouse/
+stager-hub/
 ├── build.gradle                          # Quarkus 3.35.1, all deps
 ├── docker-compose.yml                    # PostgreSQL 16 for local dev
-├── postman/seaglass-storehouse.json      # 11-request Postman collection
+├── postman/stager-hub.json      # 11-request Postman collection
 ├── logo-black-write-trans.png            # Brand logo (copied to frontend/public/logo.png)
 ├── src/main/
 │   ├── resources/
 │   │   ├── application.properties        # Quarkus config, CORS, DB (dev profile)
 │   │   └── db/migration/V1__initial_schema.sql
-│   └── java/com/mike/seaglassstorehouse/
+│   └── java/com/mike/stagerhub/
 │       ├── entity/         Location, Category, Item (JPA + Panache)
 │       ├── repository/     LocationRepository, CategoryRepository, ItemRepository
 │       ├── model/          Records: *Request, *Response, ErrorResponse

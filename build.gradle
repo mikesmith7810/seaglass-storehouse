@@ -5,7 +5,7 @@ plugins {
 
 group = 'com.mike'
 version = '0.0.1-SNAPSHOT'
-description = 'seaglass-storehouse'
+description = 'stager-hub'
 
 java {
     toolchain {

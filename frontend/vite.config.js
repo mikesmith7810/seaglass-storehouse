@@ -9,7 +9,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['logo.png'],
       manifest: {
-        name: 'Seaglass Storehouse',
+        name: 'Stager Hub',
         short_name: 'Storehouse',
         description: 'Home staging inventory management',
         theme_color: '#BFD7CB',
