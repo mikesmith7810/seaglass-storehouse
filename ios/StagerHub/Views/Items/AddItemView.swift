@@ -3,18 +3,31 @@ import SwiftUI
 struct AddItemView: View {
     @Environment(\.dismiss) private var dismiss
 
-    @State private var description = ""
-    @State private var selectedCategoryId: Int? = nil
-    @State private var selectedLocationId: Int? = nil
-    @State private var priceText = ""
-    @State private var heightText = ""
-    @State private var widthText = ""
-    @State private var depthText = ""
+    private let existingItem: ItemResponse?
+
+    @State private var description: String
+    @State private var selectedCategoryId: Int?
+    @State private var selectedLocationId: Int?
+    @State private var priceText: String
+    @State private var heightText: String
+    @State private var widthText: String
+    @State private var depthText: String
 
     @State private var categoryList: [CategoryResponse] = []
     @State private var locationList: [LocationResponse] = []
     @State private var isSubmitting = false
     @State private var errorMessage: String?
+
+    init(item: ItemResponse? = nil) {
+        existingItem = item
+        _description = State(initialValue: item?.description ?? "")
+        _selectedCategoryId = State(initialValue: item?.categoryId)
+        _selectedLocationId = State(initialValue: item?.locationId)
+        _priceText = State(initialValue: item.map { "\($0.price)" } ?? "")
+        _heightText = State(initialValue: item?.heightCm.map { "\($0)" } ?? "")
+        _widthText = State(initialValue: item?.widthCm.map { "\($0)" } ?? "")
+        _depthText = State(initialValue: item?.depthCm.map { "\($0)" } ?? "")
+    }
 
     var body: some View {
         NavigationStack {
@@ -56,7 +69,7 @@ struct AddItemView: View {
                     }
                 }
             }
-            .navigationTitle("Add Furniture")
+            .navigationTitle(existingItem == nil ? "Add Furniture" : "Edit Furniture")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -105,7 +118,11 @@ struct AddItemView: View {
             depthCm: Decimal(string: depthText)
         )
         do {
-            _ = try await APIClient.shared.createItem(request)
+            if let existing = existingItem {
+                _ = try await APIClient.shared.updateItem(id: existing.id, request)
+            } else {
+                _ = try await APIClient.shared.createItem(request)
+            }
             dismiss()
         } catch {
             errorMessage = error.localizedDescription

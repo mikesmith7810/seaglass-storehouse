@@ -66,6 +66,13 @@ public class ItemService {
         return toResponse(item);
     }
 
+    @Transactional
+    public void deleteItem(final Long id) {
+        final Item item = itemRepository.findByIdOptional(id)
+                .orElseThrow(() -> new NotFoundException("Item not found: " + id));
+        itemRepository.delete(item);
+    }
+
     public List<ItemResponse> getAllItems() {
         return itemRepository.listAll().stream()
                 .map(this::toResponse)

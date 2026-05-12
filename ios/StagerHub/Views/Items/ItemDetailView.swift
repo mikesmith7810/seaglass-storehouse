@@ -1,7 +1,12 @@
 import SwiftUI
 
 struct ItemDetailView: View {
-    let item: ItemResponse
+    @State private var item: ItemResponse
+    @State private var showingEditSheet = false
+
+    init(item: ItemResponse) {
+        _item = State(initialValue: item)
+    }
 
     var body: some View {
         List {
@@ -23,6 +28,22 @@ struct ItemDetailView: View {
         .background(Color.brandBackground)
         .navigationTitle(item.description)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button { showingEditSheet = true } label: {
+                    Image(systemName: "pencil")
+                }
+            }
+        }
+        .sheet(isPresented: $showingEditSheet, onDismiss: { Task { await refreshItem() } }) {
+            AddItemView(item: item)
+        }
+    }
+
+    private func refreshItem() async {
+        if let updated = try? await APIClient.shared.getItem(id: item.id) {
+            item = updated
+        }
     }
 }
 

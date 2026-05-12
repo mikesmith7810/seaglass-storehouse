@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -109,6 +110,24 @@ class ItemServiceTest {
     }
 
     @Test
+    void deleteItem_deletesItem_whenItemExists() {
+        final Item item = buildItem(5L, "Oak table", buildCategory(1L, "Table"), buildLocation(2L, "Dining Room"));
+        when(itemRepository.findByIdOptional(5L)).thenReturn(Optional.of(item));
+
+        itemService.deleteItem(5L);
+
+        verify(itemRepository).delete(item);
+    }
+
+    @Test
+    void deleteItem_throwsNotFound_whenItemDoesNotExist() {
+        when(itemRepository.findByIdOptional(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> itemService.deleteItem(99L))
+                .isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
     void getAllItems_returnsMappedResponses() {
         final Item itemOne = buildItem(1L, "Sofa", buildCategory(1L, "Sofa"), buildLocation(1L, "Living Room"));
         final Item itemTwo = buildItem(2L, "Chair", buildCategory(2L, "Chair"), buildLocation(2L, "Office"));
@@ -133,7 +152,7 @@ class ItemServiceTest {
     }
 
     private Location buildLocation(final Long id, final String name) {
-        final Location location = new Location(name);
+        final Location location = new Location(name, null);
         setField(location, Location.class, "id", id);
         return location;
     }

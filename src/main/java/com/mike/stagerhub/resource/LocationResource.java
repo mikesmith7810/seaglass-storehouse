@@ -13,6 +13,7 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.jboss.logging.Logger;
 
 import java.util.List;
 
@@ -20,6 +21,8 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class LocationResource {
+
+    private static final Logger LOG = Logger.getLogger(LocationResource.class);
 
     private final LocationService locationService;
 
@@ -30,18 +33,21 @@ public class LocationResource {
 
     @POST
     public Response createLocation(final LocationRequest request) {
+        LOG.info("POST /api/locations");
         final LocationResponse locationResponse = locationService.createLocation(request);
         return Response.status(Response.Status.CREATED).entity(locationResponse).build();
     }
 
     @GET
     public List<LocationResponse> getAllLocations() {
+        LOG.info("GET /api/locations");
         return locationService.getAllLocations();
     }
 
     @DELETE
     @Path("/{id:\\d+}")
     public Response removeLocation(@PathParam("id") final Long id) {
+        LOG.infof("DELETE /api/locations/%d", id);
         locationService.removeLocation(id);
         return Response.noContent().build();
     }

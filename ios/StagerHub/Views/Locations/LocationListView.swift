@@ -5,6 +5,9 @@ struct LocationListView: View {
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var showingAddSheet = false
+    @State private var locationToEdit: LocationResponse?
+    @State private var deleteErrorMessage: String?
+    @State private var showingDeleteError = false
 
     var body: some View {
         Group {
@@ -28,6 +31,19 @@ struct LocationListView: View {
                             .font(.brandBody(size: 16))
                             .foregroundStyle(Color.brandText)
                     }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button(role: .destructive) {
+                            Task { await deleteLocation(location) }
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
+                    .swipeActions(edge: .leading) {
+                        Button { locationToEdit = location } label: {
+                            Label("Edit", systemImage: "pencil")
+                        }
+                        .tint(Color.brandTeal)
+                    }
                 }
                 .scrollContentBackground(.hidden)
                 .background(Color.brandBackground)
@@ -46,6 +62,14 @@ struct LocationListView: View {
         }) {
             AddLocationView()
         }
+        .sheet(item: $locationToEdit, onDismiss: { Task { await loadLocations() } }) { location in
+            AddLocationView(location: location)
+        }
+        .alert("Could not delete location", isPresented: $showingDeleteError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(deleteErrorMessage ?? "")
+        }
         .task {
             await loadLocations()
         }
@@ -60,5 +84,15 @@ struct LocationListView: View {
             errorMessage = error.localizedDescription
         }
         isLoading = false
+    }
+
+    private func deleteLocation(_ location: LocationResponse) async {
+        do {
+            try await APIClient.shared.deleteLocation(id: location.id)
+            locationList.removeAll { $0.id == location.id }
+        } catch {
+            deleteErrorMessage = error.localizedDescription
+            showingDeleteError = true
+        }
     }
 }

@@ -1,0 +1,32 @@
+name: StagerHub
+options:
+  bundleIdPrefix: com.mike
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+
+targets:
+  StagerHub:
+    type: application
+    platform: iOS
+    sources:
+      - path: StagerHub
+    settings:
+      base:
+        SWIFT_VERSION: 5.0
+        PRODUCT_BUNDLE_IDENTIFIER: com.mike.stagerhub
+        TARGETED_DEVICE_FAMILY: "1"
+        GENERATE_INFOPLIST_FILE: NO
+        DEVELOPMENT_ASSET_PATHS: "\"StagerHub/Preview Content\""
+    info:
+      path: StagerHub/Info.plist
+      properties:
+        UILaunchScreen:
+          UIColorName: ""
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+        UIAppFonts:
+          - SourceSans3-Regular.ttf
+          - SourceSans3-SemiBold.ttf

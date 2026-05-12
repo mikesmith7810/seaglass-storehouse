@@ -13,6 +13,9 @@ struct ItemListView: View {
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var showingAddSheet = false
+    @State private var itemToEdit: ItemResponse?
+    @State private var deleteErrorMessage: String?
+    @State private var showingDeleteError = false
 
     var body: some View {
         Group {
@@ -34,6 +37,19 @@ struct ItemListView: View {
                     NavigationLink(destination: ItemDetailView(item: item)) {
                         ItemRowView(item: item)
                     }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button(role: .destructive) {
+                            Task { await deleteItem(item) }
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
+                    .swipeActions(edge: .leading) {
+                        Button { itemToEdit = item } label: {
+                            Label("Edit", systemImage: "pencil")
+                        }
+                        .tint(Color.brandTeal)
+                    }
                 }
                 .scrollContentBackground(.hidden)
                 .background(Color.brandBackground)
@@ -51,6 +67,14 @@ struct ItemListView: View {
             Task { await loadItems() }
         }) {
             AddItemView()
+        }
+        .sheet(item: $itemToEdit, onDismiss: { Task { await loadItems() } }) { item in
+            AddItemView(item: item)
+        }
+        .alert("Could not delete item", isPresented: $showingDeleteError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(deleteErrorMessage ?? "")
         }
         .task {
             await loadItems()
@@ -70,5 +94,15 @@ struct ItemListView: View {
             errorMessage = error.localizedDescription
         }
         isLoading = false
+    }
+
+    private func deleteItem(_ item: ItemResponse) async {
+        do {
+            try await APIClient.shared.deleteItem(id: item.id)
+            itemList.removeAll { $0.id == item.id }
+        } catch {
+            deleteErrorMessage = error.localizedDescription
+            showingDeleteError = true
+        }
     }
 }

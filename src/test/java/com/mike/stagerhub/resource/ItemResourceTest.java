@@ -15,6 +15,7 @@ import java.time.Instant;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -81,6 +82,14 @@ class ItemResourceTest {
         final List<ItemResponse> result = itemResource.searchItems("sofa", 1L, 2L, BigDecimal.ZERO, new BigDecimal("1000"));
 
         assertThat(result).isEqualTo(items);
+    }
+
+    @Test
+    void deleteItem_returns204() {
+        final Response result = itemResource.deleteItem(1L);
+
+        assertThat(result.getStatus()).isEqualTo(204);
+        verify(itemService).deleteItem(1L);
     }
 
     private ItemResponse buildItemResponse(final Long id, final String description) {

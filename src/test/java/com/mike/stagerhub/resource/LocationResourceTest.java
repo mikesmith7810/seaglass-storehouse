@@ -31,8 +31,8 @@ class LocationResourceTest {
 
     @Test
     void createLocation_returns201WithBody() {
-        final LocationRequest request = new LocationRequest("Living Room");
-        final LocationResponse response = new LocationResponse(1L, "Living Room");
+        final LocationRequest request = new LocationRequest("Living Room", null);
+        final LocationResponse response = new LocationResponse(1L, "Living Room", null);
         when(locationService.createLocation(request)).thenReturn(response);
 
         final Response result = locationResource.createLocation(request);
@@ -43,7 +43,7 @@ class LocationResourceTest {
 
     @Test
     void getAllLocations_returnsServiceResult() {
-        final List<LocationResponse> locations = List.of(new LocationResponse(1L, "Living Room"));
+        final List<LocationResponse> locations = List.of(new LocationResponse(1L, "Living Room", null));
         when(locationService.getAllLocations()).thenReturn(locations);
 
         final List<LocationResponse> result = locationResource.getAllLocations();
