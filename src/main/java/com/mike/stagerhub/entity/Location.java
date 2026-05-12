@@ -15,20 +15,20 @@ public class Location {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 100)
     private String name;
+
+    @Column(name = "photo_url", length = 500)
+    private String photoUrl;
 
     protected Location() {}
 
-    public Location(final String name) {
+    public Location(final String name, final String photoUrl) {
         this.name = name;
+        this.photoUrl = photoUrl;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
+    public Long getId() { return id; }
+    public String getName() { return name; }
+    public String getPhotoUrl() { return photoUrl; }
 }

@@ -14,8 +14,12 @@ export default function NavBar() {
 
   return (
     <nav className="navbar">
-      <NavLink to="/" onClick={close}>
-        <img src="/logo.png" alt="Seaglass Home Designs" className="navbar-logo" />
+      <NavLink to="/" onClick={close} className="navbar-brand">
+        <svg className="navbar-brand-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 11L12 3l9 8v10h-5v-6H8v6H3V11z" fill="currentColor" />
+          <rect x="9.5" y="14" width="5" height="4" rx="0.5" fill="var(--color-sand)" />
+        </svg>
+        <span className="navbar-brand-text">Stager Hub</span>
       </NavLink>
 
       <button

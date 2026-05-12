@@ -18,6 +18,6 @@ CREATE TABLE item (
     width_cm    DECIMAL(10,2),
     depth_cm    DECIMAL(10,2),
     photo_url   VARCHAR(500),
-    created_at  TIMESTAMP      NOT NULL DEFAULT NOW(),
-    updated_at  TIMESTAMP      NOT NULL DEFAULT NOW()
+    created_at  TIMESTAMPTZ    NOT NULL DEFAULT NOW(),
+    updated_at  TIMESTAMPTZ    NOT NULL DEFAULT NOW()
 );

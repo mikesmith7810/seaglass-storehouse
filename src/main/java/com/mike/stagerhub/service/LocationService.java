@@ -27,7 +27,7 @@ public class LocationService {
 
     @Transactional
     public LocationResponse createLocation(final LocationRequest request) {
-        final Location location = new Location(request.name());
+        final Location location = new Location(request.name(), request.photoUrl());
         locationRepository.persist(location);
         return toResponse(location);
     }
@@ -51,6 +51,6 @@ public class LocationService {
     }
 
     private LocationResponse toResponse(final Location location) {
-        return new LocationResponse(location.getId(), location.getName());
+        return new LocationResponse(location.getId(), location.getName(), location.getPhotoUrl());
     }
 }

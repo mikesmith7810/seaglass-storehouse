@@ -35,22 +35,22 @@ export default function Dashboard() {
   return (
     <div>
       <div className="page-header">
-        <h1 className="page-title">Inventory Dashboard</h1>
+        <h1 className="page-title">Inventory</h1>
         <Link to="/items/new" className="btn btn-primary">+ Add Item</Link>
       </div>
 
       <div className="stats-grid">
-        <div className="stat-card">
+        <Link to="/browse" className="stat-card" style={{ textDecoration: 'none' }}>
           <div className="stat-number">{items.length}</div>
-          <div className="stat-label">Total Items</div>
-        </div>
+          <div className="stat-label">Items</div>
+        </Link>
         <div className="stat-card">
           <div className="stat-number">{locations.length}</div>
           <div className="stat-label">Locations</div>
         </div>
         <div className="stat-card">
           <div className="stat-number">{formatValue(totalValue)}</div>
-          <div className="stat-label">Total Value</div>
+          <div className="stat-label">Value</div>
         </div>
       </div>
 
@@ -71,6 +71,13 @@ export default function Dashboard() {
               onMouseEnter={e => { e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
               onMouseLeave={e => { e.currentTarget.style.boxShadow = ''; e.currentTarget.style.transform = '' }}
             >
+              {location.photoUrl && (
+                <img
+                  src={location.photoUrl}
+                  alt={location.name}
+                  style={{ width: '100%', height: '130px', objectFit: 'cover', borderRadius: '8px', marginBottom: '0.85rem' }}
+                />
+              )}
               <h3 style={{ marginBottom: '0.5rem' }}>{location.name}</h3>
               <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
                 {location.itemCount} {location.itemCount === 1 ? 'item' : 'items'}

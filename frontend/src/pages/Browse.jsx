@@ -9,10 +9,13 @@ export default function Browse() {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [dropdownOpen, setDropdownOpen] = useState(false)
 
   const activeLocationId = searchParams.get('locationId')
     ? parseInt(searchParams.get('locationId'))
     : null
+
+  const activeLocation = locations.find(l => l.id === activeLocationId) || null
 
   useEffect(() => {
     api.get('/api/locations').then(setLocations).catch(err => setError(err.message))
@@ -31,6 +34,7 @@ export default function Browse() {
 
   const selectLocation = (id) => {
     id === null ? setSearchParams({}) : setSearchParams({ locationId: id })
+    setDropdownOpen(false)
   }
 
   return (
@@ -42,22 +46,33 @@ export default function Browse() {
 
       {error && <div className="error-banner">{error}</div>}
 
-      <div className="location-tabs">
+      <div className="location-filter">
         <button
-          className={`location-tab${activeLocationId === null ? ' active' : ''}`}
-          onClick={() => selectLocation(null)}
+          className={`location-filter-btn${activeLocation ? ' active' : ''}`}
+          onClick={() => setDropdownOpen(prev => !prev)}
         >
-          All
+          {activeLocation ? activeLocation.name : 'All'}
+          <span className="location-filter-chevron">{dropdownOpen ? '▲' : '▼'}</span>
         </button>
-        {locations.map(loc => (
-          <button
-            key={loc.id}
-            className={`location-tab${activeLocationId === loc.id ? ' active' : ''}`}
-            onClick={() => selectLocation(loc.id)}
-          >
-            {loc.name}
-          </button>
-        ))}
+        {dropdownOpen && (
+          <div className="location-dropdown">
+            <button
+              className={`location-dropdown-item${!activeLocationId ? ' active' : ''}`}
+              onClick={() => selectLocation(null)}
+            >
+              All
+            </button>
+            {locations.map(loc => (
+              <button
+                key={loc.id}
+                className={`location-dropdown-item${activeLocationId === loc.id ? ' active' : ''}`}
+                onClick={() => selectLocation(loc.id)}
+              >
+                {loc.name}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {loading ? (

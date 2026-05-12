@@ -23,7 +23,7 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -34,18 +34,25 @@ public class Item {
     @JoinColumn(name = "location_id", nullable = false)
     private Location location;
 
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
+    @Column(name = "height_cm", precision = 10, scale = 2)
     private BigDecimal heightCm;
+
+    @Column(name = "width_cm", precision = 10, scale = 2)
     private BigDecimal widthCm;
+
+    @Column(name = "depth_cm", precision = 10, scale = 2)
     private BigDecimal depthCm;
+
+    @Column(name = "photo_url", length = 500)
     private String photoUrl;
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
-    @Column(nullable = false)
+    @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
     protected Item() {}

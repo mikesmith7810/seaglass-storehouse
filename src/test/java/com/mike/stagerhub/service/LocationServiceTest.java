@@ -47,10 +47,11 @@ class LocationServiceTest {
             return null;
         }).when(locationRepository).persist(any(Location.class));
 
-        final LocationResponse result = locationService.createLocation(new LocationRequest("Living Room"));
+        final LocationResponse result = locationService.createLocation(new LocationRequest("Living Room", null));
 
         assertThat(result.id()).isEqualTo(1L);
         assertThat(result.name()).isEqualTo("Living Room");
+        assertThat(result.photoUrl()).isNull();
     }
 
     @Test
@@ -97,7 +98,7 @@ class LocationServiceTest {
     }
 
     private Location buildLocation(final Long id, final String name) {
-        final Location location = new Location(name);
+        final Location location = new Location(name, null);
         setId(location, id);
         return location;
     }
