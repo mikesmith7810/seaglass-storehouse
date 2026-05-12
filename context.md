@@ -6,7 +6,9 @@ This file provides continuity between Claude Code sessions for the Stager Hub pr
 
 ## What this project is
 
-A home staging inventory PWA. Tracks furniture and props across storage locations with pricing, dimensions, and physical label IDs. Used on iPhone. Built as a personal project.
+A home staging inventory app. Tracks furniture and props across storage locations with pricing, dimensions, and physical label IDs. Used on iPhone. Built as a personal project.
+
+The frontend is being replaced: the React PWA is being removed and replaced with a native Swift iOS app. The core new capability is RFID scanning via a TSL 1128 Bluetooth reader to update item locations without manual input.
 
 ---
 
@@ -15,7 +17,7 @@ A home staging inventory PWA. Tracks furniture and props across storage location
 | Decision | Choice | Reason |
 |---|---|---|
 | Backend | Quarkus 3.35.1 | Chosen over Spring Boot; Gradle 9.4.1 requires 3.35.1+ (3.15.1 incompatible) |
-| Frontend | React 19 + Vite 6 + vite-plugin-pwa | PWA for iPhone home screen install |
+| Mobile app | Swift + SwiftUI (iOS) | Replacing React PWA; native required for TSL 1128 SDK |
 | Database | PostgreSQL 16 | Self-managed on GCP e2-micro (always-free tier) |
 | Migrations | Flyway | Versioned schema, runs at startup in dev |
 | Testing | Mockito + AssertJ | Pure unit tests only, no @QuarkusTest |
@@ -32,9 +34,12 @@ A home staging inventory PWA. Tracks furniture and props across storage location
 - **Dimensions**: Stored in cm (heightCm, widthCm, depthCm), all optional
 - **Prices**: GBP, stored as DECIMAL(10,2)
 - **Item photo URLs**: Column exists in schema and entity (`photo_url`) but upload not yet implemented — deferred to Phase 3
-- **CORS**: Permissively configured (`*`) for now; will be restricted to Cloud Storage domain in Phase 3
+- **CORS**: Permissively configured (`*`) for now; will be restricted to Cloud Run domain in Phase 5
 - **JAX-RS path routing**: Item endpoints use `@Path("/{id:\\d+}")` regex to avoid conflict with the `/search` literal path
-- **Frontend dev**: Vite proxies `/api` to `localhost:8080`, so no CORS issues in dev. `allowedHosts: true` set for ngrok access from iPhone
+- **RFID EPC**: `rfid_epc` column will be added to the `item` table (nullable); stores the EPC programmed onto the physical RFID tag attached to that item
+- **RFID scanner abstraction**: A `RFIDScanner` Swift protocol with `MockRFIDScanner` (in-app simulate button, no Bluetooth) and `TSL1128Scanner` (real SDK) implementations, toggled by a build flag
+- **Scan-to-move flow**: User selects destination location → scans tags → each EPC resolves to an item via `GET /api/items/epc/{epc}` → location patched via `PATCH /api/items/{id}/location`
+- **Apple Developer license**: Not yet purchased. Free Xcode provisioning used for on-device testing (7-day certificates). Mock scanner runs in iOS Simulator so hardware is not required for Phases 1–3
 
 ---
 
@@ -58,25 +63,10 @@ stager-hub/
 │       ├── resource/       LocationResource, CategoryResource, ItemResource (JAX-RS)
 │       └── exception/      ConflictException + ConflictExceptionMapper
 ├── src/test/               Unit tests (Mockito + AssertJ)
-└── frontend/
-    ├── vite.config.js      # Dev proxy + PWA manifest; allowedHosts: true
-    ├── src/
-    │   ├── api/client.js   # Fetch wrapper (uses VITE_API_URL env var)
-    │   ├── components/     NavBar (SVG wordmark), ItemCard
-    │   ├── pages/          Dashboard, Browse, Search, ItemDetail, ItemForm, Admin
-    │   └── styles/global.css  # Brand CSS variables, full component styles
-    └── public/logo.png
+└── frontend/               TO BE DELETED — replaced by native Swift iOS app
 ```
 
----
-
-## Frontend UI notes
-
-- **Font**: Source Sans 3 (Google Fonts) — used for both heading and body
-- **Navbar**: CSS/SVG wordmark ("Stager Hub" + house icon), no image logo
-- **Dashboard**: stat cards in a fixed 3-column row (always horizontal); label above number; "Items" card links to /browse
-- **Browse**: location filter is a single dropdown pill (not a tab row); shows "All" or the active location name
-- **Admin — Locations**: separate form with name + optional photo URL inputs; thumbnails shown in list
+The iOS app will live in a separate Xcode project directory (e.g. `ios/StagerHub.xcodeproj`). It communicates with the Quarkus backend over HTTP using `URLSession` + `async/await`.
 
 ---
 
@@ -113,22 +103,41 @@ testImplementation 'io.quarkus:quarkus-junit5-mockito' // includes mockito-junit
 
 | Phase | Status |
 |---|---|
-| Phase 1 — Local foundation (backend, DB, tests, Postman) | Complete |
-| Phase 2 — React PWA frontend | Complete |
-| Phase 3 — GCP deployment | Not started |
-| Phase 4 — PWA polish | Not started |
+| Phase 0 — Local foundation (backend, DB, tests, Postman) | Complete |
+| Phase 1 — Swift app foundation (Xcode project, API layer, free provisioning) | Not started |
+| Phase 2 — Core screens (item list, detail, add/edit, search, admin) | Not started |
+| Phase 3 — RFID scanner abstraction + mock + scan-to-move flow | Not started |
+| Phase 4 — Real TSL 1128 integration (requires hardware) | Not started |
+| Phase 5 — GCP deployment | Not started |
 
 ---
 
-## Phase 3 scope (next up)
+## Backend additions required before Phase 3
 
+These backend changes are needed before the RFID scan flow can work:
+
+1. **`V3__add_rfid_epc.sql`** migration — add `rfid_epc VARCHAR(100) UNIQUE` (nullable) to `item`
+2. **`GET /api/items/epc/{epc}`** — look up a single item by its RFID EPC
+3. **`PATCH /api/items/{id}/location`** — update only the `location_id` of an item (avoids requiring a full PUT payload at scan time)
+
+---
+
+## Phase 5 scope (GCP deployment)
+
+| Component | Solution |
+|---|---|
+| Backend | Quarkus container on Cloud Run (free tier) |
+| Database | PostgreSQL on always-free e2-micro Compute Engine VM |
+| Photos | Cloud Storage bucket |
+| Secrets | Secret Manager |
+
+Steps:
 1. Dockerfile for Quarkus backend
-2. Deploy backend to Cloud Run (free tier)
-3. Provision e2-micro VM on GCP, install PostgreSQL, create DB + user
-4. Deploy frontend static build (`npm run build`) to Cloud Storage bucket, configure as public static site
+2. Deploy backend to Cloud Run
+3. Provision e2-micro VM, install PostgreSQL, create DB + user
+4. Implement `POST /api/items/{id}/photo` and `POST /api/locations/{id}/photo` — upload to Cloud Storage, store URL in `photo_url`
 5. Secret Manager for production DB credentials
-6. Implement `POST /api/items/{id}/photo` and `POST /api/locations/{id}/photo` — upload to Cloud Storage, store URL in `photo_url`
-7. Restrict CORS to the Cloud Storage frontend domain
+6. Restrict CORS to the Cloud Run domain
 
 ---
 
